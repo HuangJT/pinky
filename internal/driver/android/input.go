@@ -230,7 +230,7 @@ func (d *Device) Type(ctx context.Context, text string, opt driver.TypeOptions) 
 	}
 	enter := func() error {
 		if opt.SearchInputIdentity != "" {
-			if err := d.checkSearchInput(ctx, opt.SearchInputIdentity); err != nil {
+			if err := d.waitSearchInput(ctx, opt.SearchInputIdentity); err != nil {
 				return fmt.Errorf("search input changed before submission: %w", err)
 			}
 		}

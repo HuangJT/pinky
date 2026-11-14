@@ -1,11 +1,53 @@
 package android
 
 import (
+	"context"
+	"errors"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/DIYgod/pinky/internal/screen"
 )
+
+func TestSearchInputWaitsOnlyForSameEditor(t *testing.T) {
+	t.Run("transient overlay", func(t *testing.T) {
+		calls := 0
+		err := waitSearchIdentity(context.Background(), "original", func(context.Context) (string, error) {
+			calls++
+			if calls == 1 {
+				return "", nil
+			}
+			return "original", nil
+		})
+		if err != nil || calls != 2 {
+			t.Fatalf("err=%v calls=%d", err, calls)
+		}
+	})
+	t.Run("different editor", func(t *testing.T) {
+		calls := 0
+		err := waitSearchIdentity(context.Background(), "original", func(context.Context) (string, error) { calls++; return "other", nil })
+		if err == nil || calls != 1 {
+			t.Fatalf("err=%v calls=%d", err, calls)
+		}
+	})
+	t.Run("persistent overlay", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+		defer cancel()
+		err := waitSearchIdentity(ctx, "original", func(context.Context) (string, error) { return "", nil })
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("err=%v", err)
+		}
+	})
+	t.Run("cancelled", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		err := waitSearchIdentity(ctx, "original", func(context.Context) (string, error) { t.Fatal("read after cancellation"); return "original", nil })
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("err=%v", err)
+		}
+	})
+}
 
 // Synthetic current metadata; never commit a person's input-method dump.
 const searchInputFixture = `Current Input Method Manager state:

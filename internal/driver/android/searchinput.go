@@ -208,14 +208,59 @@ func (d *Device) recoverSearchInput(ctx context.Context, s *screen.Screen, proof
 	s.SearchInputIdentity = token
 }
 
-func (d *Device) checkSearchInput(ctx context.Context, expected string) error {
+func (d *Device) currentSearchInput(ctx context.Context) (string, error) {
 	w, h, err := d.naturalSize(ctx)
+	if err != nil {
+		return "", err
+	}
+	p := d.readWindowIdentity(ctx, w, h)
+	if p == nil {
+		return "", nil
+	}
+	return d.readSearchInput(ctx, p), nil
+}
+
+func (d *Device) checkSearchInput(ctx context.Context, expected string) error {
+	got, err := d.currentSearchInput(ctx)
 	if err != nil {
 		return err
 	}
-	p := d.readWindowIdentity(ctx, w, h)
-	if p == nil || d.readSearchInput(ctx, p) != expected {
+	if got == "" || got != expected {
 		return fmt.Errorf("the verified search input changed or is unavailable")
 	}
 	return nil
+}
+
+// Pasting can show Android's transient clipboard overlay. While it is
+// visible the window proof correctly fails. Wait without acting, then
+// require the exact original editor again; a different editor fails at
+// once. A persistent overlay, lost focus or cancellation never sends Enter.
+func (d *Device) waitSearchInput(ctx context.Context, expected string) error {
+	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
+	defer cancel()
+	return waitSearchIdentity(ctx, expected, d.currentSearchInput)
+}
+
+func waitSearchIdentity(ctx context.Context, expected string, read func(context.Context) (string, error)) error {
+	if expected == "" {
+		return fmt.Errorf("missing search input proof")
+	}
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		got, err := read(ctx)
+		if err != nil {
+			return err
+		}
+		if got != "" {
+			if got == expected {
+				return nil
+			}
+			return fmt.Errorf("the verified search input changed")
+		}
+		if err := sleepCtx(ctx, 100*time.Millisecond); err != nil {
+			return err
+		}
+	}
 }
