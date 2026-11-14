@@ -485,6 +485,12 @@ func (g *Gateway) act(ctx context.Context, l *lease, c Call, a Action) *Result {
 		}
 	}
 	cur, err := g.startScreen(ctx, l, c)
+	// A recovered Android window has no accessible editor. Implicit typing
+	// needs a fresh OCR read so its driver can corroborate a current search
+	// editor; never reuse a prior screen's search proof or a placeholder.
+	if err == nil && a.Tool == "type" && a.Ref == 0 && cur != nil && !cur.Locked && cur.CaptureIdentity != "" && cur.SearchInputIdentity == "" {
+		cur, err = g.observe(ctx, d, true)
+	}
 	if err != nil {
 		d.act.Unlock()
 		return g.readError(l, err)
