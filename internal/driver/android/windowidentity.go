@@ -20,6 +20,7 @@ const windowIdentityCommand = "dumpsys window -a"
 
 type windowIdentity struct {
 	app   string
+	uid   string
 	frame screen.Rect
 	bars  []screen.Rect
 	token string
@@ -190,7 +191,7 @@ func parseWindowIdentity(out string, width, height int) *windowIdentity {
 	if front.frame != full {
 		return nil
 	}
-	p := &windowIdentity{app: front.pkg, frame: front.frame}
+	p := &windowIdentity{app: front.pkg, uid: front.uid, frame: front.frame}
 	var fingerprint strings.Builder
 	belowFocus := false
 	for _, w := range visible {

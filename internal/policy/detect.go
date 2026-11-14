@@ -370,7 +370,22 @@ func IsSearchBox(target *screen.Element, s *screen.Screen) bool {
 	if target != nil {
 		return IsSearchField(target)
 	}
-	return impliedSearchBox(s)
+	return verifiedSearchInput(s) || impliedSearchBox(s)
+}
+
+// verifiedSearchInput is supplied by the driver from the currently bound
+// editor, not from a word on the page. Never override an accessible input
+// or a conflicting focus with this fallback.
+func verifiedSearchInput(s *screen.Screen) bool {
+	if s == nil || s.Locked || s.App.ID == "" || s.CaptureIdentity == "" || s.SearchInputIdentity == "" {
+		return false
+	}
+	for _, e := range s.Elements {
+		if e.Role == screen.RoleInput || e.Has(screen.StateEditable) || e.Has(screen.StateFocused) || IsCredentialField(&e) {
+			return false
+		}
+	}
+	return true
 }
 
 // impliedSearchBox reports whether the field that has focus, which s does
@@ -638,7 +653,7 @@ func detect(in Input, cats []string) []Kind {
 	case OpType:
 		// A line break may press Enter, which sends in many chat apps.
 		submit := in.Submit || strings.ContainsAny(in.Text, "\n\r")
-		if submit && (has(CatMessaging) || has(CatSocial)) && !IsSearchField(t) {
+		if submit && (has(CatMessaging) || has(CatSocial)) && !(IsSearchField(t) || (t == nil && verifiedSearchInput(in.Screen))) {
 			add(SendMessage)
 		}
 	case OpKey:

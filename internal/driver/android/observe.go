@@ -63,6 +63,9 @@ func (d *Device) ObserveWithText(ctx context.Context, opt driver.ObserveOptions)
 		src.frame = opt.Frame
 	}
 	st := addText(ctx, s, sc, opt, since, src)
+	if sc.proof != nil {
+		d.recoverSearchInput(ctx, s, sc.proof)
+	}
 	d.textLog.note(d.cfg.logf, d.info.ID, st)
 	return s, st, nil
 }

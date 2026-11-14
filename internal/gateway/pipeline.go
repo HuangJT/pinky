@@ -2042,7 +2042,11 @@ func (g *Gateway) perform(ctx context.Context, dev driver.Device, a Action, p *p
 				return ctx.Err()
 			}
 		}
-		return dev.Type(ctx, a.Text, driver.TypeOptions{Append: a.Append, Submit: a.Submit})
+		opt := driver.TypeOptions{Append: a.Append, Submit: a.Submit}
+		if p.target == nil && p.input.Screen != nil {
+			opt.SearchInputIdentity = p.input.Screen.SearchInputIdentity
+		}
+		return dev.Type(ctx, a.Text, opt)
 	case "swipe":
 		return dev.Swipe(ctx, p.from, p.to, p.dur)
 	case "pinch":

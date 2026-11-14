@@ -6,6 +6,41 @@ import (
 	"github.com/DIYgod/pinky/internal/screen"
 )
 
+func TestReadOnlyDriverVerifiedSearchInput(t *testing.T) {
+	app := screen.App{ID: "com.tencent.mm", Name: "WeChat"}
+	base := screen.Screen{App: app, Width: 1080, Height: 1920, CaptureIdentity: "wm:0:proof", SearchInputIdentity: "ime-search:proof"}
+	e := commitsEngine(t)
+	for _, tc := range []struct {
+		name   string
+		change func(*screen.Screen)
+		want   Decision
+	}{
+		{"headless search", func(s *screen.Screen) {}, Allow},
+		{"no proof", func(s *screen.Screen) { s.SearchInputIdentity = "" }, Deny},
+		{"no window", func(s *screen.Screen) { s.CaptureIdentity = "" }, Deny},
+		{"locked", func(s *screen.Screen) { s.Locked = true }, Deny},
+		{"unknown app", func(s *screen.Screen) { s.App.ID = "" }, Deny},
+		{"chat field", func(s *screen.Screen) { s.Elements = []screen.Element{{Role: screen.RoleInput, Label: "Message"}} }, Deny},
+		{"unknown focus", func(s *screen.Screen) { s.Elements = []screen.Element{{States: []string{screen.StateFocused}}} }, Deny},
+		{"credential", func(s *screen.Screen) {
+			s.Elements = []screen.Element{{Role: screen.RoleInput, Label: "Password", States: []string{screen.StatePassword}}}
+		}, Deny},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := base
+			tc.change(&s)
+			v := e.Evaluate(Input{Op: OpType, App: app, Text: "new query", Submit: true, Screen: &s, ReadOnly: true})
+			if v.Decision != tc.want {
+				t.Fatalf("got %+v, want %v", v, tc.want)
+			}
+		})
+	}
+	// An explicitly chosen ordinary field must not inherit a different search proof.
+	if IsSearchBox(&screen.Element{Role: screen.RoleInput, Label: "Message"}, &base) {
+		t.Fatal("explicit chat input inherited search proof")
+	}
+}
+
 // Read-only mode types into an app's own search box that reads as no field,
 // only its placeholder (Xianyu, GitHub issue #76), and still into no other
 // field.

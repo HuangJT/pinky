@@ -336,8 +336,11 @@ type TapOptions struct {
 
 // TypeOptions tune Type.
 type TypeOptions struct {
-	Append bool // keep the field's current text
-	Submit bool // press Enter afterwards
+	// SearchInputIdentity binds an accessibility-missing search editor to
+	// the observation that allowed typing. Supporting drivers recheck it.
+	SearchInputIdentity string
+	Append              bool // keep the field's current text
+	Submit              bool // press Enter afterwards
 }
 
 // App is an installed app.

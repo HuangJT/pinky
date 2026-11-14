@@ -229,13 +229,29 @@ func (d *Device) Type(ctx context.Context, text string, opt driver.TypeOptions) 
 		return err
 	}
 	enter := func() error {
+		if opt.SearchInputIdentity != "" {
+			if err := d.checkSearchInput(ctx, opt.SearchInputIdentity); err != nil {
+				return fmt.Errorf("search input changed before submission: %w", err)
+			}
+		}
 		return d.withInput(ctx, false, func(l *live) error { return l.key(keycodeEnter, 0) })
 	}
 	c := d.companionClient(ctx)
+	if opt.SearchInputIdentity != "" {
+		if err := d.checkSearchInput(ctx, opt.SearchInputIdentity); err != nil {
+			return err
+		}
+	}
 	var refused error
 	if c != nil {
-		done, why, err := d.typeCompanion(ctx, c, text, opt.Append, opt.Submit, 0, d.recentTap, enter)
+		// A recovered editor must be revalidated before a separate Enter;
+		// do not let the companion submit it in the set-text request.
+		companionSubmit := opt.Submit && opt.SearchInputIdentity == ""
+		done, why, err := d.typeCompanion(ctx, c, text, opt.Append, companionSubmit, 0, d.recentTap, enter)
 		if done {
+			if err == nil && opt.Submit && !companionSubmit {
+				return enter()
+			}
 			return err
 		}
 		refused = why
@@ -244,7 +260,14 @@ func (d *Device) Type(ctx context.Context, text string, opt driver.TypeOptions) 
 	check := d.checkField(ctx, c, 0)
 	o := opt
 	o.Submit = false // after the check: text that did not land is not sent
-	if err := d.withInput(ctx, false, func(l *live) error { return l.typeText(ctx, text, o, keys) }); err != nil {
+	if err := d.withInput(ctx, false, func(l *live) error {
+		if opt.SearchInputIdentity != "" {
+			if err := d.checkSearchInput(ctx, opt.SearchInputIdentity); err != nil {
+				return err
+			}
+		}
+		return l.typeText(ctx, text, o, keys)
+	}); err != nil {
 		return err
 	}
 	if err := check.after(ctx, text, opt.Append, opt.Submit, keys, refused, !d.keyTyping(ctx)); err != nil {

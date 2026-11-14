@@ -212,6 +212,10 @@ type Screen struct {
 	// CaptureIdentity is an optional driver proof for an otherwise missing
 	// accessibility identity. A screenshot is discarded if this changes.
 	CaptureIdentity string `json:"-"`
+	// SearchInputIdentity is a fresh driver proof of the connected search
+	// editor when accessibility cannot expose its field. It is not inferred
+	// from OCR alone and must be checked again by the driver before typing.
+	SearchInputIdentity string `json:"-"`
 }
 
 // Find returns the element with the given ref.
