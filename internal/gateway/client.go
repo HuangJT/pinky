@@ -220,7 +220,7 @@ func (g *Gateway) Needs() []NeedView {
 			App: info.App, Agent: info.Agent, TaskID: info.TaskID, Title: info.Title, Detail: info.Detail, Rule: info.Rule,
 			Created: info.Created, Deadline: info.Deadline, Screenshot: info.Screenshot, Target: info.Target,
 			Point: info.Point, To: info.To, Point2: info.Point2, To2: info.To2, Path: info.Path, AlwaysAllow: g.canAlwaysAllow(info), AllowTask: canAllowTask(info),
-			Unblock: isUnblock(info), ReadOnly: askedReadOnly(info)})
+			Unblock: isUnblock(info), ReadOnly: askedReadOnly(info), Apps: askedApps(info)})
 	}
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -448,9 +448,12 @@ func (g *Gateway) TakeOver(deviceID string) error {
 // HandBack, across leases.
 func (g *Gateway) takeOver(d *device, byInput bool) {
 	g.mu.Lock()
-	if l := d.lease; byInput && l != nil && l.bg != nil {
+	if l := d.lease; byInput && l != nil && l.background() {
 		// The person uses the phone's own screen; the agent works on its
-		// background display and goes on.
+		// background display and goes on, also while that display is still
+		// opening or opens again after the phone dropped. Should it not
+		// open, the task waits for a person who used the screen lately
+		// (readyScreen).
 		d.personAt = time.Now()
 		g.mu.Unlock()
 		return
