@@ -4136,6 +4136,10 @@
   "@flyoutPasscode": {
     "description": "Menu bar flyout: what the Needs you row of an iPhone says after the phone's name when iOS asks on the phone for its passcode before Pinky on the iPhone may control it."
   },
+  "flyoutLost": "Restart the device service",
+  "@flyoutLost": {
+    "description": "Menu bar flyout: what the Needs you row of an iPhone says after the phone's name when the Mac's device service (usbmuxd) lost the phone on Wi-Fi and an agent's task waits for someone at the computer to restart the service."
+  },
   "flyoutReview": "Review",
   "@flyoutReview": {
     "description": "Menu bar flyout: the action at the end of a Needs you row; a click opens the approval."
@@ -6376,6 +6380,30 @@
       }
     }
   },
+  "gwSetupLostDetail": "This computer's device service lost the phone on Wi-Fi, and only someone at the computer can restart it. {agent} is waiting · {task}",
+  "@gwSetupLostDetail": {
+    "description": "The second line of the card Pinky shows when an agent's task waits for a phone that the Mac's device service (usbmuxd) lost on Wi-Fi: restarting the service needs the computer's administrator password, so only someone at the computer can do it. Shown only in other languages; in English the gateway's own words show.",
+    "placeholders": {
+      "agent": {
+        "type": "String",
+        "example": "Claude Code"
+      },
+      "task": {
+        "type": "String",
+        "example": "Bookkeeping"
+      }
+    }
+  },
+  "gwSetupLostTitle": "Restart the device service for {phone}",
+  "@gwSetupLostTitle": {
+    "description": "The title of the card Pinky shows when an agent's task waits for a phone that the Mac's device service (usbmuxd) lost on Wi-Fi; the card has the Restart device service button. Shown only in other languages; in English the gateway's own words show.",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "iPhone 13 mini"
+      }
+    }
+  },
   "gwUnlockDetail": "{agent} is waiting for the phone to unlock · {task}",
   "@gwUnlockDetail": {
     "description": "The second line of the unlock card. Shown only in other languages; in English the gateway's own words show.",
@@ -6575,6 +6603,56 @@
   "helperInstalledToast": "Pinky is installed on {phone}.",
   "@helperInstalledToast": {
     "description": "Toast once Pinky on the iPhone is installed from Pinky's window. phone is the iPhone's name, or \"the iPhone\".",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "DIYgod's iPhone"
+      }
+    }
+  },
+  "helperLiteDone": "Done",
+  "@helperLiteDone": {
+    "description": "Button closing the dialog on LocalDevVPN that shows once Pinky installed the lite version of Pinky on the iPhone."
+  },
+  "helperLiteIntro": "Your Apple ID can't sign Pinky's own VPN (that takes a paid Apple Developer account), so Pinky installed the lite version of Pinky on the iPhone. Pinky on this computer can use {phone} as it is. For Pinky on the iPhone to run tasks on the phone by itself, it needs LocalDevVPN, a free app from the App Store:",
+  "@helperLiteIntro": {
+    "description": "Dialog after Pinky installed the lite version of Pinky on the iPhone (built for a free Apple ID, without its own VPN): why, and that Pinky on the iPhone needs the App Store app LocalDevVPN (a name, never translated) to run tasks by itself. Numbered steps follow. phone is the iPhone's name, or \"the iPhone\".",
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "DIYgod's iPhone"
+      }
+    }
+  },
+  "helperLiteStepAddresses": "In LocalDevVPN, open Settings › Network Configuration, set Tunnel IP to {tunnel} and Device IP to {device}, and save.",
+  "@helperLiteStepAddresses": {
+    "description": "Second step in the LocalDevVPN dialog. Settings, Network Configuration, Tunnel IP and Device IP are LocalDevVPN's own words, which it shows in English on a phone in Simplified Chinese; keep them as LocalDevVPN shows them in the language (Japanese: 設定 › ネットワーク設定, トンネル IP, デバイス IP). tunnel and device are addresses.",
+    "placeholders": {
+      "tunnel": {
+        "type": "String",
+        "example": "10.7.0.2/30"
+      },
+      "device": {
+        "type": "String",
+        "example": "10.7.0.1/32"
+      }
+    }
+  },
+  "helperLiteStepConnect": "Tap Connect in LocalDevVPN, then open Pinky on the iPhone and follow its steps.",
+  "@helperLiteStepConnect": {
+    "description": "Third step in the LocalDevVPN dialog. Connect is LocalDevVPN's button (Japanese: 接続; English in Simplified Chinese)."
+  },
+  "helperLiteStepInstall": "On the iPhone, install LocalDevVPN from the App Store.",
+  "@helperLiteStepInstall": {
+    "description": "First step in the LocalDevVPN dialog after Pinky installed the lite version of Pinky on the iPhone."
+  },
+  "helperLiteStore": "LocalDevVPN in the App Store",
+  "@helperLiteStore": {
+    "description": "Link in the LocalDevVPN dialog: opens LocalDevVPN's App Store page in the browser."
+  },
+  "helperLiteTitle": "One more step on {phone}: LocalDevVPN",
+  "@helperLiteTitle": {
+    "description": "Title of the dialog after Pinky installed the lite version of Pinky on the iPhone, which needs the App Store app LocalDevVPN on the phone. phone is the iPhone's name, or \"the iPhone\".",
     "placeholders": {
       "phone": {
         "type": "String",

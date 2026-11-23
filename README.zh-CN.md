@@ -137,7 +137,7 @@ iPhone 或 iPad 和电脑在同一个 Wi-Fi 下，并且电脑在 Wi-Fi 上列�
 
 通过 Wi-Fi 时每一步都比有线慢，截图最明显。在 iPad Pro 11 英寸（第三代，iPadOS 27.0.1）上实测，Wi-Fi 对比有线：滑动后 80 到 210 毫秒画面出现变化（有线 60 到 90 毫秒），读一次主屏幕 0.6 到 2.6 秒（0.5 到 0.6 秒），截一张图 5 秒（1 秒），视频丢包 0.2%（有线为 0）。拔掉线后，正在运行的任务约 5 秒切到 Wi-Fi；插回线后 2 到 6 秒切回有线（[详情](docs/notes/ios.md#wi-fi)）。
 
-在 Mac 上，系统的设备服务 usbmuxd 在和 Wi-Fi 上的 iPhone 的连接断过一次之后（比如手机的 Wi-Fi 关了又开），可能会把它弄丢，最长约一小时都不再找它，「访达」里也看不到。Pinky 发现你用的手机明明在网络上却不再被列出时，会显示「Wi-Fi 上找不到」，并在它的页面上提供「重启设备服务…」：你确认后，macOS 会要求输入管理员密码，所有 iPhone 和 iPad（包括插着线的）都会断开一两秒。在「终端」里运行 `sudo killall usbmuxd` 效果相同。刚拔线的手机，Pinky 大约 10 秒内就会给出提示；其他情况下会等一分钟，因为熄屏后醒来的手机会自己回来。拔线后这台电脑在 Wi-Fi 上完全看不到的手机，会显示「Wi-Fi 上看不到」，并说明可能的原因：手机熄屏了、连的是另一个网络或者网络会把设备互相隔开（访客网络、一些路由器）、开着 VPN，或者 Pinky 没有「本地网络」权限。
+在 Mac 上，系统的设备服务 usbmuxd 在和 Wi-Fi 上的 iPhone 的连接断过一次之后（比如手机的 Wi-Fi 关了又开），可能会把它弄丢，最长约一小时都不再找它，「访达」里也看不到。Pinky 发现你用的手机明明在网络上却不再被列出时，会显示「Wi-Fi 上找不到」，并在它的页面上提供「重启设备服务…」：你确认后，macOS 会要求输入管理员密码，所有 iPhone 和 iPad（包括插着线的）都会断开一两秒。在「终端」里运行 `sudo killall usbmuxd` 效果相同。这一步只有坐在电脑前的人才能做，所以当智能体的任务在等这样一台手机时，Pinky 会把重启按钮放进「待你处理」并发一条通知，同时告诉智能体：没人在电脑前就别等了。刚拔线的手机，Pinky 大约 10 秒内就会给出提示；其他情况下会等一分钟，因为熄屏后醒来的手机会自己回来。拔线后这台电脑在 Wi-Fi 上完全看不到的手机，会显示「Wi-Fi 上看不到」，并说明可能的原因：手机熄屏了、连的是另一个网络或者网络会把设备互相隔开（访客网络、一些路由器）、开着 VPN，或者 Pinky 没有「本地网络」权限。
 
 在 Linux 和 Windows 上，系统的设备服务不会自己列出 Wi-Fi 上的 iPhone 和 iPad：Linux 上（`usbmuxd` 软件包）只列出插着线的，Windows 上（Apple Devices 或 iTunes）只在手机同时插着线时才列出。所以在这两个系统上，Pinky 通过 Wi-Fi 使用手机时，会在系统的设备服务前面运行一个自己的小设备服务：它在网络上找到和这台电脑配对过的手机，直接连过去，插线手机的事都交给系统的设备服务。这时 Pinky 和 iPhone、iPad 之间的所有连接都经过它，插着线的也一样。除了系统自带的（Linux 上是 `usbmuxd`，Windows 上是 Apple Devices），不用另外安装或设置什么。如果你运行了一个自己就能列出 Wi-Fi 上手机的设备服务（比如 netmuxd），并带上指向它的 `USBMUXD_SOCKET_ADDRESS`（`unix:///socket/路径` 或 `tcp://127.0.0.1:端口`）启动 Pinky，Pinky 就用它，不再运行自己的。
 
@@ -241,7 +241,7 @@ Android 手机不必和电脑在同一个网络里。电脑和手机都装上 [T
   - 像电脑上一样执行定时任务（见上文）。
 
   已在 Mi 10 Pro（LineageOS，Android 17）上用真实模型试过。
-- **iPhone**：在装有 Xcode 的 Mac 上安装 Pinky 的应用：在手机页面或「设置 › 手机」里点「安装 iPhone 上的 Pinky」，或者运行 `pinkyctl helper install`（[怎么装](docs/notes/ios.md#installing-pinky-on-the-iphone)）。在 iPhone 上打开 Pinky，按它的步骤来：先「让 Pinky 与这台 iPhone 配对」（iOS 27 上在 iPhone 的「设置」里输入 Pinky 显示的配对码；iOS 27 以下要在装有 Pinky 的 Mac 上配对一次），再「打开 Pinky 的 VPN」（它让 Pinky 在手机上就能连到这台手机），最后选择 AI 模型并添加 API 密钥。需要你确认的事会在 Pinky 里等你，也会发通知；实时活动会显示任务和「停止」按钮。「在 Pinky 中新建任务」快捷指令会打开 Pinky，带上任务，以及从共享表单传来的文字或链接，直接就能开始。带自己 VPN 的应用需要付费的 Apple 开发者账号；用免费 Apple ID 时，Pinky 会构建一个轻量版应用，它要配合 App Store 上的 LocalDevVPN 使用（[详情](docs/notes/iphone-app.md)）。已在 iPhone 13 mini（iOS 27.0.1）上用真实模型试过一个简单任务，任务由调试版启动（[这次运行](docs/notes/iphone-app.md#a-real-model-on-the-phone-run)）。
+- **iPhone**：在装有 Xcode 的 Mac 上安装 Pinky 的应用：在手机页面或「设置 › 手机」里点「安装 iPhone 上的 Pinky」，或者运行 `pinkyctl helper install`（[怎么装](docs/notes/ios.md#installing-pinky-on-the-iphone)）。在 iPhone 上打开 Pinky，按它的步骤来：先「让 Pinky 与这台 iPhone 配对」（iOS 27 上在 iPhone 的「设置」里输入 Pinky 显示的配对码；iOS 27 以下要在装有 Pinky 的 Mac 上配对一次），再「打开 Pinky 的 VPN」（它让 Pinky 在手机上就能连到这台手机），最后选择 AI 模型并添加 API 密钥。需要你确认的事会在 Pinky 里等你，也会发通知；实时活动会显示任务和「停止」按钮。「在 Pinky 中新建任务」快捷指令会打开 Pinky，带上任务，以及从共享表单传来的文字或链接，直接就能开始。带自己 VPN 的应用需要付费的 Apple 开发者账号；用免费 Apple ID 时，Pinky 会构建一个轻量版应用，它用 App Store 上的免费应用 [LocalDevVPN](https://apps.apple.com/app/localdevvpn/id6755608044) 代替 Pinky 的 VPN：在 iPhone 上安装它，在它的 Settings › Network Configuration 中把 Tunnel IP 设为 `10.7.0.2/30`、Device IP 设为 `10.7.0.1/32`，再点按 Connect。Mac 上的 Pinky 装好轻量版后会提示这些步骤；iPhone 上 Pinky 的第二步「打开 LocalDevVPN」会等到 LocalDevVPN 连上为止（[详情](docs/notes/iphone-app.md)）。已在 iPhone 13 mini（iOS 27.0.1）上用真实模型试过一个简单任务，任务由调试版启动（[这次运行](docs/notes/iphone-app.md#a-real-model-on-the-phone-run)）。
 
 ### 更新
 
