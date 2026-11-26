@@ -2,6 +2,94 @@
 
 What changed for people in each release of Pinky, newest first. A version is the release's date in Asia/Shanghai and that day's count: 2026.1107.2 is the second release of 7 November 2026. Notes wait under "Unreleased" until the next release takes them; see [docs/RELEASING.md](docs/RELEASING.md).
 
+## 2026.1125.9 (2026-11-25)
+
+- An iPhone app with a specially crafted Info.plist can no longer make Pinky quit when an agent asks to install it. Pinky now refuses an app whose Info.plist or provisioning profile is larger than 1 MB; real ones are tens of kilobytes. Thanks @pseudoyu.
+
+## 2026.1125.8 (2026-11-25)
+
+- A phone's own window, opened with Open in a window, now has no title bar or menu bar, only the phone's screen and the bar with its keys under it. Drag the window by an empty part of that bar, and close it with the × at the end of the bar or ⌘W (Ctrl+W on Windows and Linux). Thanks @QFinn-Penguin for the idea.
+
+## 2026.1125.7 (2026-11-25)
+
+- Installing an Android app whose resource table is damaged no longer makes Pinky quit. Thanks @pseudoyu.
+- When a phone waiting for you to finish a step becomes ready, an agent's request that arrives at that moment now waits for the phone instead of rarely being told it is offline.
+
+## 2026.1125.6 (2026-11-25)
+
+- On Android, a password you or the app show with "Show password" now stays masked in Activity, approvals, history and pictures, and Pinky asks before an agent types into that field as it does for any password field.
+
+## 2026.1125.5 (2026-11-25)
+
+- When an agent hands Pinky a task without naming a phone, Pinky now picks the phone the agent would get by connecting: the one online, or else one waiting for you to finish a step. A phone found on Wi-Fi that you haven't confirmed as yours is never picked or shown to agents.
+- Pinky now also clears passwords and codes it masked from the free space of its history file, so no old copy stays on disk.
+- Reconnecting or removing Codex no longer deletes the comments after Pinky's section in Codex's config.toml, and Pinky now reads a config.toml that starts with a byte order mark.
+- On a Mac, Pinky builds its iPhone app only from the kit made for its own release, and downloads the kit again when the copy it has doesn't match.
+
+## 2026.1125.4 (2026-11-25)
+
+- When no phone is online, agents now hear why: each paired phone with its status, such as Not seen on Wi-Fi, and what usually causes it, so they can tell you what to check.
+- Pinky masks typed passwords and codes in more places: a field named after its code, a batch of steps that types a password, the approval card of a hidden passcode keypad, and a typing step that fails.
+
+## 2026.1125.3 (2026-11-25)
+
+- You can now let agents type passwords and one-time codes that their task gives them on your phones, for signing in with test accounts: turn on Settings › Safety › Allow passwords on phones. Pinky asks you each time, unless you always allow it in that app, and never types a phone's own passcode.
+- Passwords and codes typed into sign-in fields now show as •••••• in Activity, approvals, history and exports, on virtual phones too, and Pinky masks the ones that earlier versions kept.
+
+## 2026.1125.2 (2026-11-25)
+
+- On a Mac, Settings › Phones › Restart device service without a password lets Pinky bring back an iPhone that macOS loses on Wi-Fi by itself while a task uses it, instead of asking for your administrator password each time. It is off by default; turning it on or off asks for the password once.
+
+## 2026.1125.1 (2026-11-25)
+
+- On an iPhone left on Automatic with Pinky on the iPhone installed, a task that opens the Camera now moves to Pinky on the iPhone, so the camera no longer shows black. A scan inside another app, such as WeChat, still needs the agent to ask for that connection.
+
+## 2026.1124.11 (2026-11-24)
+
+- Opening an app on an iPhone no longer fails when the connection to the phone drops for a moment, for example right after another tool installed an app: Pinky tries again by itself.
+- On an iPhone, opening an app while a notification banner comes in no longer marks all of the app's buttons and text as missing from the screenshot.
+- Agents in read-only mode can now stop a development build of an app (a debug build on Android, a development-signed build on iPhone), so they can restart an app they are testing. Installing and uninstalling are still refused.
+
+## 2026.1124.10 (2026-11-24)
+
+- Reading an iPhone app's logs no longer brings back mostly system lines caused by Pinky reading the screen, so the app's own lines show up again. The result says how many lines were left out.
+
+## 2026.1124.9 (2026-11-24)
+
+- An iPhone nobody is watching in Pinky can now turn its screen off. Pinky stops a phone's live picture while its window is hidden, minimized or covered, and a locked iPhone's page shows its last picture until you point at the screen. Thanks @tangh.
+
+## 2026.1124.8 (2026-11-24)
+
+- An Android phone connected over Wi-Fi that has only a software H.265 encoder now sends its picture in H.264. Before, its picture came out small and blurry, and an Android 13 emulator could run out of memory. Thanks @YuHoYe.
+
+## 2026.1124.7 (2026-11-24)
+
+- When the phone's picture in Pinky freezes because the video decoder on the computer stops responding (seen on Windows after tapping an iPhone's recent apps button in the mirror), Pinky now notices within a few seconds and opens the picture again, decoding in software. Thanks @longzhonguo for reporting it.
+
+## 2026.1124.6 (2026-11-24)
+
+- Connecting or removing Codex in Settings › Agents no longer deletes a comment written right above the next table in Codex's `config.toml`. Thanks @pseudoyu.
+
+## 2026.1124.5 (2026-11-24)
+
+- Connecting or removing Codex in Settings › Agents now works when Codex's `config.toml` has prompts with triple quotes or table names with `#` or brackets. Thanks @yuearc.
+
+## 2026.1124.4 (2026-11-24)
+
+- When an iPhone's mirror stops showing new pictures while the phone keeps working, for example after a permission alert, Pinky now notices within a few seconds and restarts the picture by itself, without restarting Pinky. Thanks @longzhonguo for reporting it.
+
+## 2026.1124.3 (2026-11-24)
+
+- When the live picture of an iPhone stops moving while the phone keeps changing, Pinky now notices and brings the picture back by itself, and notes it in its log for feedback. Thanks @longzhonguo for reporting it.
+
+## 2026.1124.2 (2026-11-24)
+
+- An iPhone's tile in All phones now says **Not live** when it shows the phone's last picture instead of its live screen, so it no longer looks like the mirror froze. Open the phone's page to watch it live.
+
+## 2026.1124.1 (2026-11-24)
+
+- On some Android phones, such as the Honor 9X, a touch on the phone's window in Pinky now lands where you made it, not off toward the top left. Thanks @longzhonguo for reporting it.
+
 ## 2026.1123.6 (2026-11-23)
 
 - Reading on with the continuation of a long list on a web page no longer stops right away saying content may have been skipped, when the screen showed many lines. Thanks @pseudoyu.
