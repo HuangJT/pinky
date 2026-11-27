@@ -160,6 +160,12 @@ const (
 	// no longer lists it, and will not for up to an hour. Restarting the
 	// service (DeviceServiceRestarter) brings it back.
 	SetupDeviceService = "device_service"
+	// SetupOwnHotspot: the computer is on the phone's own Personal Hotspot,
+	// where its device service (usbmuxd on a Mac) does not reach the phone
+	// over the network, though the phone is there. Restarting the service
+	// does not help: a cable brings the phone back, or the computer and the
+	// phone on the same other Wi-Fi network.
+	SetupOwnHotspot = "own_hotspot"
 	// SetupPhoneChanged: an Android phone reached over the network is not
 	// the phone Pinky set up under its id: it lacks the identity mark
 	// Pinky left on that phone (a phone that was reset, or another device
@@ -556,8 +562,10 @@ type Waker interface {
 }
 
 // Unlocker enters the phone's PIN or passcode on its lock screen. Only the
-// person can trigger it, from the client after Touch ID or the system's
-// equivalent; agents never reach it and never see the PIN. It wakes the
+// person can allow it, from the client after Touch ID or the system's
+// equivalent: for one unlock, or for the agents' steps that find the phone
+// locked during an unlock window they confirmed once (gateway's
+// unlockwindow.go). Agents never reach it and never see the PIN. It wakes the
 // screen, brings up the PIN pad, enters pin and confirms, then returns nil
 // once the lock screen is gone, ErrLocked when it is still there after the
 // PIN was entered (a wrong PIN: one attempt used), or ErrPINNotEntered when

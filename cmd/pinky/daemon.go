@@ -41,6 +41,9 @@ func runDaemon(args []string) error {
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
+	if err := wordsUsageError(fs); err != nil {
+		return err
+	}
 	c.Log = newLogger(os.Stderr, *verbose)
 	if dirs, err := api.DefaultDirs(); err == nil && dirs.Ensure() == nil {
 		crashes := captureCrashes(dirs, "daemon", c.Log)
@@ -130,6 +133,10 @@ type gatewayConfig struct {
 	// PIN hands out a phone's saved PIN for unlocking from the computer;
 	// nil turns that off (the daemon has no one to confirm it).
 	PIN func(ctx context.Context, deviceID string) (string, error)
+	// UnlockWindowPIN hands out a phone's saved PIN for unlocking it without
+	// asking for a while (gateway.Options.UnlockWindowPIN); nil turns that
+	// off, as for PIN.
+	UnlockWindowPIN func(ctx context.Context, deviceID string, length time.Duration) (string, error)
 	// Crashes is the process's crash capture, for usage statistics.
 	Crashes *telemetry.Crashes
 }
@@ -209,10 +216,11 @@ func startGateway(c gatewayConfig) (*runningGateway, error) {
 		ApprovalTimeout: c.ApprovalTimeout, IdleTimeout: c.IdleTimeout, NoScreenshots: c.NoScreenshots,
 		// Fake phones cannot hurt anything, so agents need no first approval
 		// and socket clients may answer approvals (for scripted tests).
-		TrustNewAgents: c.Fake,
-		PIN:            c.PIN,
-		TrafficKeys:    trafficKeys(c.Fake),
-		TrafficTailnet: trafficTailnet(c.Fake),
+		TrustNewAgents:  c.Fake,
+		PIN:             c.PIN,
+		UnlockWindowPIN: c.UnlockWindowPIN,
+		TrafficKeys:     trafficKeys(c.Fake),
+		TrafficTailnet:  trafficTailnet(c.Fake),
 	})
 	if err != nil {
 		ln.Close()
